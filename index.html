@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHIM HAY — Xem phim trực tuyến</title>
+<style>
+:root{--bg:#080a0f;--surface:#111620;--surface2:#19212d;--line:#293241;--text:#f5f7fa;--muted:#a1abba;--accent:#f04452;--accent2:#ff7a66}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}
+header{height:72px;position:sticky;top:0;z-index:5;background:#080a0fee;backdrop-filter:blur(15px);border-bottom:1px solid #ffffff12;display:flex;align-items:center;gap:28px;padding:0 max(4vw,18px)}
+.brand{font-size:24px;font-weight:950;letter-spacing:-.06em;white-space:nowrap}.brand span{color:var(--accent)}nav{display:flex;gap:22px}nav a{color:#c8ced8;text-decoration:none;font-size:14px}nav a:hover{color:#fff}.spacer{flex:1}.search{width:min(270px,30vw);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:white;outline-color:var(--accent)}.userbtn{border:1px solid var(--line);background:var(--surface);color:white;border-radius:9px;padding:10px 13px}
+main{max-width:1320px;margin:auto;padding:24px 26px 70px}.hero{height:450px;position:relative;overflow:hidden;border-radius:17px;background:linear-gradient(90deg,#080a0f 0%,#080a0fdd 34%,#080a0f44 72%),linear-gradient(0deg,#080a0f 0%,transparent 55%),url('https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1800&q=85') center 42%/cover;display:flex;align-items:center;padding:clamp(24px,5vw,62px)}
+.hero-inner{max-width:550px}.eyebrow{color:#ff858b;font-size:11px;font-weight:850;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(38px,5.5vw,68px);line-height:.98;letter-spacing:-.05em;margin:14px 0}.hero p{color:#c3c9d2;line-height:1.7;max-width:480px}.meta{color:#e0e4e9;font-size:13px;margin:16px 0}.btn{border:0;border-radius:8px;padding:12px 18px;font-weight:800}.btn-red{background:var(--accent);color:white}.btn-ghost{background:#ffffff20;color:white;border:1px solid #ffffff35;margin-left:8px}
+.notice{margin:18px 0 0;padding:11px 14px;border:1px solid #3b3032;background:#1b1317;color:#e5c5c7;border-radius:9px;font-size:12px;line-height:1.55}
+.section{margin-top:38px}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:17px;gap:12px}.section-head h2{font-size:22px;margin:0;letter-spacing:-.025em}.section-head p{font-size:13px;color:var(--muted);margin:6px 0 0}.small-link{background:none;border:0;color:#ff858b;font-size:13px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0 20px}.chip{border:1px solid var(--line);background:var(--surface);color:#cbd1da;border-radius:30px;padding:9px 14px;font-size:12px}.chip.active{background:var(--accent);border-color:var(--accent);color:white;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:17px}.card{min-width:0;cursor:pointer}.poster{position:relative;aspect-ratio:2/3;background:var(--surface2);border-radius:10px;overflow:hidden;border:1px solid #ffffff12}.poster img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.card:hover .poster img{transform:scale(1.045)}.rating{position:absolute;left:8px;top:8px;background:#080a0fdf;border:1px solid #ffffff24;border-radius:5px;padding:5px 7px;font-size:11px}.year{position:absolute;right:8px;top:8px;background:#080a0fdf;border-radius:5px;padding:5px 7px;font-size:10px}.card h3{font-size:14px;margin:9px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card .sub{font-size:12px;color:var(--muted)}.empty{padding:25px 0;color:var(--muted)}
+.row-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px}.row-scroll .card{flex:0 0 175px}
+footer{border-top:1px solid var(--line);padding:30px 20px;text-align:center;color:#7e8999;font-size:12px;line-height:1.8}
+.overlay{display:none;position:fixed;inset:0;z-index:10;background:#000d;align-items:center;justify-content:center;padding:18px}.overlay.show{display:flex}.dialog{width:min(760px,100%);max-height:92vh;overflow:auto;background:#111620;border:1px solid var(--line);border-radius:15px}.dialog-poster{width:100%;height:240px;object-fit:cover;display:block}.dialog-body{padding:22px}.dialog-body h2{margin:8px 0}.dialog-body p{color:#bdc5d0;line-height:1.65}.dialog-actions{display:flex;gap:9px;flex-wrap:wrap}.outline{background:transparent;border:1px solid var(--line);color:white;border-radius:8px;padding:11px 14px}.close{float:right;background:var(--surface2);color:white;border:0;border-radius:7px;padding:8px 12px}
+.playerbox{background:#030405;aspect-ratio:16/9;display:grid;place-items:center;text-align:center;padding:25px;color:#c5cbd4}.playerbox .playicon{font-size:48px;color:var(--accent)}.playerbox p{max-width:470px;font-size:13px;line-height:1.6}.playerbox video{width:100%;height:100%;max-height:65vh;background:#000}
+.formline{display:grid;gap:7px;margin:13px 0}.formline label{font-size:13px;color:#c5cbd4}.formline input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#0b1018;color:white}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#202a38;color:white;border:1px solid var(--line);padding:11px 16px;border-radius:9px;display:none;z-index:20;font-size:13px}
+@media(max-width:950px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{height:410px}}
+@media(max-width:700px){header{gap:12px;height:64px}nav{display:none}.search{width:34vw}main{padding:17px 15px 50px}.hero{height:420px;padding:24px;background-position:58% center}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}}
+@media(max-width:470px){.brand{font-size:20px}.userbtn{font-size:12px;padding:9px}.search{min-width:0;width:31vw;font-size:12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{height:390px}.row-scroll .card{flex-basis:145px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">PHIM<span>HAY.</span></div>
+ <nav><a href="#home">Trang chủ</a><a href="#popular">Phổ biến</a><a href="#catalog">Thể loại</a><a href="#saved">Danh sách của tôi</a></nav>
+ <div class="spacer"></div>
+ <input class="search" id="search" placeholder="Tìm phim..." aria-label="Tìm phim" oninput="render()">
+ <button class="userbtn" onclick="openLogin()">Đăng nhập</button>
+</header>
+<main id="home">
+ <section class="hero">
+  <div class="hero-inner">
+   <div class="eyebrow">PHIM HAY · TUYỂN CHỌN HÔM NAY</div>
+   <h1>Mỗi bộ phim,<br>một thế giới.</h1>
+   <div class="meta">Khám phá phim · Nhiều thể loại · Miễn phí</div>
+   <p>Tìm câu chuyện tiếp theo bạn muốn khám phá. Duyệt phim, lưu vào danh sách yêu thích và xem thông tin phim trong một giao diện điện ảnh hiện đại.</p>
+   <button class="btn btn-red" onclick="document.querySelector('#catalog').scrollIntoView({behavior:'smooth'})">Khám phá ngay</button>
+   <button class="btn btn-ghost" onclick="showDetails(1)">Tìm hiểu thêm</button>
+  </div>
+ </section>
+ <div class="notice">Đây là bản mẫu giao diện. Nội dung phim và poster chỉ dùng minh họa; chức năng phát phim sẽ chỉ hoạt động khi kết nối video mà bạn có quyền phân phối hoặc nội dung thuộc phạm vi công cộng.</div>
+ <section class="section" id="popular"><div class="section-head"><div><h2>Phim được quan tâm</h2><p>Một vài gợi ý để bắt đầu</p></div></div><div class="row-scroll" id="featured"></div></section>
+ <section class="section" id="catalog"><div class="section-head"><div><h2>Khám phá phim</h2><p>Lọc theo thể loại hoặc tìm kiếm tên phim</p></div></div><div class="toolbar" id="filters"></div><div class="grid" id="movies"></div></section>
+ <section class="section" id="saved"><div class="section-head"><div><h2>Danh sách của tôi</h2><p>Những phim bạn đã lưu trên trình duyệt này</p></div></div><div class="grid" id="savedgrid"></div></section>
+</main>
+<footer><b style="color:#fff;letter-spacing:.1em">PHIMHAY.</b><br>Website demo khám phá phim trực tuyến.<br>Chỉ đăng tải hoặc phát nội dung khi bạn có quyền sử dụng và phân phối.</footer>
+
+<div class="overlay" id="detail" onclick="if(event.target===this)closeOverlay('detail')"><div class="dialog"><img class="dialog-poster" id="dimg" alt="Poster phim"><div class="dialog-body"><button class="close" onclick="closeOverlay('detail')">Đóng ✕</button><div class="eyebrow" id="dgenre"></div><h2 id="dtitle"></h2><div class="meta" id="dmeta"></div><p id="ddesc"></p><div class="dialog-actions"><button class="btn btn-red" onclick="openPlayer()">▶ Xem phim</button><button class="outline" id="savebtn" onclick="toggleSaved(currentId)">＋ Lưu phim</button></div></div></div></div>
+<div class="overlay" id="player" onclick="if(event.target===this)closeOverlay('player')"><div class="dialog"><div class="dialog-body"><button class="close" onclick="closeOverlay('player')">Đóng ✕</button><div class="eyebrow">TRÌNH PHÁT PHIM</div><h2 id="ptitle">Xem phim</h2><div class="playerbox" id="playerbox"><div><div class="playicon">▶</div><b>Chưa kết nối video</b><p>Để phát phim, chủ website cần thêm đường dẫn video được cấp phép hoặc video thuộc phạm vi công cộng. Bản demo không cung cấp bản sao phim có bản quyền.</p></div></div></div></div></div>
+<div class="overlay" id="login" onclick="if(event.target===this)closeOverlay('login')"><div class="dialog"><div class="dialog-body"><button class="close" onclick="closeOverlay('login')">Đóng ✕</button><div class="eyebrow">TÀI KHOẢN</div><h2>Đăng nhập / Đăng ký</h2><p>Giao diện minh họa. Tài khoản thật cần máy chủ bảo mật.</p><div class="formline"><label>Email</label><input type="email" placeholder="email@example.com"></div><div class="formline"><label>Mật khẩu</label><input type="password" placeholder="Nhập mật khẩu"></div><button class="btn btn-red" onclick="toast('Chức năng tài khoản sẽ được kết nối ở bước tiếp theo.')">Tiếp tục</button></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const data=[
+{id:1,t:"Dune: Part Two",g:"Khoa học viễn tưởng",y:2024,r:"8.5",img:"photo-1446776811953-b23d57bd21aa",desc:"Một hành trình khoa học viễn tưởng giữa sa mạc, những lựa chọn khó khăn và vận mệnh của nhiều thế giới."},
+{id:2,t:"The Batman",g:"Hành động",y:2022,r:"7.8",img:"photo-1519608487953-e999c86e7455",desc:"Một câu chuyện trinh thám u tối về công lý và những bí ẩn trong thành phố lớn."},
+{id:3,t:"Oppenheimer",g:"Chính kịch",y:2023,r:"8.3",img:"photo-1518709268805-4e9042af9f23",desc:"Câu chuyện về khoa học, trách nhiệm và một bước ngoặt của lịch sử."},
+{id:4,t:"Interstellar",g:"Khoa học viễn tưởng",y:2014,r:"8.7",img:"photo-1451187580459-43490279c0fa",desc:"Một chuyến du hành vượt qua giới hạn không gian để tìm kiếm hy vọng."},
+{id:5,t:"La La Land",g:"Tình cảm",y:2016,r:"8.0",img:"photo-1518837695005-2083093ee35b",desc:"Âm nhạc, tình yêu và những ước mơ giữa thành phố Los Angeles."},
+{id:6,t:"Parasite",g:"Chính kịch",y:2019,r:"8.5",img:"photo-1511818966892-d7d671e672a2",desc:"Một câu chuyện nhiều lớp về khoảng cách xã hội và những bí mật gia đình."},
+{id:7,t:"Spider-Verse",g:"Hoạt hình",y:2023,r:"8.6",img:"photo-1533929736458-ca588d08c8be",desc:"Cuộc phiêu lưu hoạt hình qua nhiều thế giới song song."},
+{id:8,t:"Knives Out",g:"Bí ẩn",y:2019,r:"7.9",img:"photo-1518709594023-6eab9bab7b23",desc:"Một vụ án bí ẩn với nhiều nghi phạm và những cú ngoặt bất ngờ."},
+{id:9,t:"The Grand Budapest Hotel",g:"Hài",y:2014,r:"8.1",img:"photo-1511818966892-d7d671e672a2",desc:"Cuộc phiêu lưu hài hước trong một khách sạn độc đáo."},
+{id:10,t:"Arrival",g:"Khoa học viễn tưởng",y:2016,r:"7.9",img:"photo-1451187580459-43490279c0fa",desc:"Một nhà ngôn ngữ học tìm cách giao tiếp với những vị khách lạ."}
+];
+const genres=["Tất cả","Hành động","Chính kịch","Khoa học viễn tưởng","Tình cảm","Hoạt hình","Bí ẩn","Hài"];
+let genre="Tất cả",currentId=1,saved=JSON.parse(localStorage.getItem("phimhay_saved")||"[]");
+const poster=m=>`https://images.unsplash.com/${m.img}?auto=format&fit=crop&w=600&q=80`;
+function card(m){return `<article class="card" onclick="showDetails(${m.id})"><div class="poster"><img loading="lazy" src="${poster(m)}" alt="Ảnh minh họa ${m.t}"><span class="rating">★ ${m.r}</span><span class="year">${m.y}</span></div><h3>${m.t}</h3><div class="sub">${m.g}</div></article>`}
+function render(){let q=document.getElementById("search").value.toLowerCase();document.getElementById("filters").innerHTML=genres.map(g=>`<button class="chip ${genre===g?'active':''}" onclick="genre='${g}';render()">${g}</button>`).join("");let list=data.filter(m=>(genre==="Tất cả"||m.g===genre)&&m.t.toLowerCase().includes(q));document.getElementById("movies").innerHTML=list.length?list.map(card).join(""):'<div class="empty">Không tìm thấy phim phù hợp.</div>';let picks=data.filter(m=>saved.includes(m.id));document.getElementById("savedgrid").innerHTML=picks.length?picks.map(card).join(""):'<div class="empty">Bạn chưa lưu phim nào. Mở chi tiết phim và chọn “Lưu phim”.</div>'}
+function showDetails(id){currentId=id;let m=data.find(x=>x.id===id);document.getElementById("dimg").src=poster(m);document.getElementById("dgenre").textContent=m.g;document.getElementById("dtitle").textContent=m.t;document.getElementById("dmeta").textContent=m.y+" · ★ "+m.r;document.getElementById("ddesc").textContent=m.desc;document.getElementById("savebtn").textContent=saved.includes(id)?"✓ Đã lưu":"＋ Lưu phim";document.getElementById("detail").classList.add("show")}
+function openPlayer(){let m=data.find(x=>x.id===currentId);document.getElementById("ptitle").textContent=m.t;document.getElementById("detail").classList.remove("show");document.getElementById("player").classList.add("show")}
+function toggleSaved(id){saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];localStorage.setItem("phimhay_saved",JSON.stringify(saved));document.getElementById("savebtn").textContent=saved.includes(id)?"✓ Đã lưu":"＋ Lưu phim";render();toast(saved.includes(id)?"Đã thêm vào danh sách của bạn.":"Đã xóa khỏi danh sách.")}
+function openLogin(){document.getElementById("login").classList.add("show")}
+function closeOverlay(id){document.getElementById(id).classList.remove("show")}
+function toast(s){let e=document.getElementById("toast");e.textContent=s;e.style.display="block";setTimeout(()=>e.style.display="none",2400)}
+document.getElementById("featured").innerHTML=data.slice(0,6).map(card).join("");render();
+</script>
+</body></html>
