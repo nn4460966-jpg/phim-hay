@@ -183,5 +183,68 @@ document.getElementById("flash").textContent=flashcards[fi];
 fi=(fi+1)%flashcards.length;
 }
 </script>
-</body>
+</body><section id="account">
+  <h2>👤 TÀI KHOẢN HỌC SINH</h2>
+  <div class="card">
+    <h3>Đăng ký tài khoản</h3>
+    <input id="regEmail" type="email" placeholder="Nhập email">
+    <input id="regPassword" type="password" placeholder="Tạo mật khẩu">
+    <button class="btn" onclick="registerUser()">Đăng ký</button>
+
+    <hr>
+    <h3>Đăng nhập</h3>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Mật khẩu">
+    <button class="btn" onclick="loginUser()">Đăng nhập</button>
+    <button class="btn" onclick="logoutUser()">Đăng xuất</button>
+    <p id="accountMessage"></p>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://svhwozfwuexgiwrdripm.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_8lT10deFDA7OFHe2F794Kw_bon_pg8q";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function registerUser() {
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+  const message = document.getElementById("accountMessage");
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? error.message
+    : "Đăng ký thành công! Hãy kiểm tra email nếu được yêu cầu xác nhận.";
+}
+
+async function loginUser() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const message = document.getElementById("accountMessage");
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? error.message
+    : "Đăng nhập thành công! Chào mừng đến RULER STUDY.";
+}
+
+async function logoutUser() {
+  const { error } = await supabaseClient.auth.signOut();
+  document.getElementById("accountMessage").textContent =
+    error ? error.message : "Đã đăng xuất.";
+}
+</script>
 </html>
