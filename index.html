@@ -261,18 +261,229 @@ async function loginUser() {
             panel = document.createElement("section");
             panel.id = "adminDashboard";
             panel.innerHTML = `
-                <h2>👑 BẢNG ĐIỀU KHIỂN ADMIN</h2>
-                <p>Chào mừng quản trị viên RULER STUDY!</p>
-                <p>Quyền tài khoản: ADMIN</p>
-            `;
-            document.body.appendChild(panel);
-        }
+<h2>👑 BẢNG ĐIỀU KHIỂN ADMIN</h2>
+<p>Chào mừng quản trị viên RULER STUDY!</p>
+
+<div class="grid">
+  <div class="tool">
+    <h3>👥 Quản lý học sinh</h3>
+    <button class="btn" onclick="loadStudents()">Xem học sinh</button>
+    <div id="studentsList"></div>
+  </div>
+
+  <div class="tool">
+    <h3>📚 Quản lý môn học</h3>
+    <input id="subjectName" placeholder="Tên môn học">
+    <input id="subjectDesc" placeholder="Mô tả môn học">
+    <button class="btn" onclick="addSubject()">Thêm môn học</button>
+    <div id="subjectsList"></div>
+  </div>
+
+  <div class="tool">
+    <h3>❓ Quản lý câu hỏi</h3>
+    <input id="qText" placeholder="Nội dung câu hỏi">
+    <select id="qSubject">
+      <option value="">Chọn môn học</option>
+    </select>
+    <input id="qA" placeholder="Đáp án A">
+    <input id="qB" placeholder="Đáp án B">
+    <input id="qC" placeholder="Đáp án C">
+    <input id="qD" placeholder="Đáp án D">
+    <select id="qCorrect">
+      <option value="0">Đáp án đúng A</option>
+      <option value="1">Đáp án đúng B</option>
+      <option value="2">Đáp án đúng C</option>
+      <option value="3">Đáp án đúng D</option>
+    </select>
+    <button class="btn" onclick="addQuestion()">Thêm câu hỏi</button>
+    <div id="questionsList"></div>
+  </div>
+
+  <div class="tool">
+    <h3>🏆 Kết quả học tập</h3>
+    <button class="btn" onclick="loadResults()">Xem kết quả</button>
+    <div id="resultsList"></div>
+  </div>
+</div>
+`;
+document.body.appendChild(panel);
+loadStudents();
+loadSubjects();
+loadQuestions();
+loadResults();
     } else {
         message.textContent = "Đăng nhập thành công! Chào mừng học sinh.";
     }
 }
 
-async function logoutUser() {
+function safeText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+// 1. DANH SÁCH HỌC SINH
+async function loadStudents() {
+  const box = document.getElementById("studentsList");
+  box.textContent = "Đang tải...";
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id,email,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = error.message;
+    return;
+  }
+
+  box.innerHTML = data.length
+    ? data.map(s => `<p>👤 ${safeText(s.email)}</p>`).join("")
+    : "Chưa có học sinh.";
+}
+
+// 2. QUẢN LÝ MÔN HỌC
+async function loadSubjects() {
+  const box = document.getElementById("subjectsList");
+  const select = document.getElementById("qSubject");
+
+  const { data, error } = await supabaseClient
+    .from("subjects").select("*").order("name");
+
+  if (error) {
+    box.textContent = error.message;
+    return;
+  }
+
+  select.innerHTML = '<option value="">Chọn môn học</option>';
+
+  data.forEach(s => {
+    select.innerHTML +=
+      `<option value="${safeText(s.id)}">${safeText(s.name)}</option>`;
+  });
+
+  box.innerHTML = data.map(s => `
+    <p>${safeText(s.name)}
+    <button onclick="deleteSubject('${s.id}')">Xóa</button></p>
+  `).join("") || "Chưa có môn học.";
+}
+
+async function addSubject() {
+  const name = document.getElementById("subjectName").value.trim();
+  const description = document.getElementById("subjectDesc").value.trim();
+
+  if (!name) {
+    alert("Nhập tên môn học!");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("subjects").insert({ name, description });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  document.getElementById("subjectName").value = "";
+  document.getElementById("subjectDesc").value = "";
+  loadSubjects();
+}
+
+async function deleteSubject(id) {
+  if (!confirm("Xóa môn học này?")) return;
+
+  const { error } = await supabaseClient
+    .from("subjects").delete().eq("id", id);
+
+  if (error) alert(error.message);
+  else loadSubjects();
+}
+
+// 3. QUẢN LÝ CÂU HỎI
+async function loadQuestions() {
+  const box = document.getElementById("questionsList");
+
+  const { data, error } = await supabaseClient
+    .from("questions")
+    .select("id,question")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = error.message;
+    return;
+  }
+
+  box.innerHTML = data.map(q => `
+    <p>${safeText(q.question)}
+    <button onclick="deleteQuestion('${q.id}')">Xóa</button></p>
+  `).join("") || "Chưa có câu hỏi.";
+}
+
+async function addQuestion() {
+  const question = document.getElementById("qText").value.trim();
+  const options = ["qA", "qB", "qC", "qD"].map(
+    id => document.getElementById(id).value.trim()
+  );
+
+  if (!question || options.some(x => !x)) {
+    alert("Nhập câu hỏi và đủ 4 đáp án!");
+    return;
+  }
+
+  const subject = document.getElementById("qSubject").value;
+
+  const { error } = await supabaseClient.from("questions").insert({
+    question,
+    options,
+    subject_id: subject || null,
+    correct_index: Number(document.getElementById("qCorrect").value)
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  ["qText", "qA", "qB", "qC", "qD"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+
+  loadQuestions();
+  alert("Đã thêm câu hỏi!");
+}
+
+async function deleteQuestion(id) {
+  if (!confirm("Xóa câu hỏi này?")) return;
+
+  const { error } = await supabaseClient
+    .from("questions").delete().eq("id", id);
+
+  if (error) alert(error.message);
+  else loadQuestions();
+}
+
+// 4. KẾT QUẢ HỌC TẬP
+async function loadResults() {
+  const box = document.getElementById("resultsList");
+
+  const { data, error } = await supabaseClient
+    .from("quiz_attempts")
+    .select("user_id,score,total,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = error.message;
+    return;
+  }
+
+  box.innerHTML = data.map(r => `
+    <p>Học sinh: ${safeText(r.user_id)}<br>
+    Điểm: ${r.score}/${r.total}</p>
+  `).join("") || "Chưa có kết quả.";
+}
+  async function logoutUser() {
   const { error } = await supabaseClient.auth.signOut();
   document.getElementById("accountMessage").textContent =
     error ? error.message : "Đã đăng xuất.";
