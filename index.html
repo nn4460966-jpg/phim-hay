@@ -238,94 +238,39 @@ async function registerUser() {
 }
 
 async function loginUser() {
-  alert("Nút đăng nhập đã hoạt động!");
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    const message = document.getElementById("accountMessage");
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const message = document.getElementById("accountMessage");
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-    });
+  message.textContent = "Đang đăng nhập...";
 
-    if (error) {
-        message.textContent = error.message;
-        return;
-    }
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-    const { data: roleData, error: roleError } = await supabaseClient
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id)
-        .single();
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
 
-    if (roleError) {
-        message.textContent = "Đăng nhập thành công nhưng chưa kiểm tra được quyền.";
-        return;
-    }
+  const { data: roleData, error: roleError } = await supabaseClient
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", data.user.id)
+    .single();
 
-    if (roleData.role === "admin") {
-        message.textContent = "Đăng nhập thành công! Quyền ADMIN.";
+  if (roleError) {
+    message.textContent = "Đăng nhập được nhưng không kiểm tra được quyền.";
+    return;
+  }
 
-        let panel = document.getElementById("adminDashboard");
-
-        if (!panel) {
-            panel = document.createElement("section");
-            panel.id = "adminDashboard";
-            panel.innerHTML = `
-<h2>👑 BẢNG ĐIỀU KHIỂN ADMIN</h2>
-<p>Chào mừng quản trị viên RULER STUDY!</p>
-
-<div class="grid">
-  <div class="tool">
-    <h3>👥 Quản lý học sinh</h3>
-    <button class="btn" onclick="loadStudents()">Xem học sinh</button>
-    <div id="studentsList"></div>
-  </div>
-
-  <div class="tool">
-    <h3>📚 Quản lý môn học</h3>
-    <input id="subjectName" placeholder="Tên môn học">
-    <input id="subjectDesc" placeholder="Mô tả môn học">
-    <button class="btn" onclick="addSubject()">Thêm môn học</button>
-    <div id="subjectsList"></div>
-  </div>
-
-  <div class="tool">
-    <h3>❓ Quản lý câu hỏi</h3>
-    <input id="qText" placeholder="Nội dung câu hỏi">
-    <select id="qSubject">
-      <option value="">Chọn môn học</option>
-    </select>
-    <input id="qA" placeholder="Đáp án A">
-    <input id="qB" placeholder="Đáp án B">
-    <input id="qC" placeholder="Đáp án C">
-    <input id="qD" placeholder="Đáp án D">
-    <select id="qCorrect">
-      <option value="0">Đáp án đúng A</option>
-      <option value="1">Đáp án đúng B</option>
-      <option value="2">Đáp án đúng C</option>
-      <option value="3">Đáp án đúng D</option>
-    </select>
-    <button class="btn" onclick="addQuestion()">Thêm câu hỏi</button>
-    <div id="questionsList"></div>
-  </div>
-
-  <div class="tool">
-    <h3>🏆 Kết quả học tập</h3>
-    <button class="btn" onclick="loadResults()">Xem kết quả</button>
-    <div id="resultsList"></div>
-  </div>
-</div>
-`;
-document.body.appendChild(panel);
-loadStudents();
-loadSubjects();
-loadQuestions();
-loadResults();
-    } else {
-        message.textContent = "Đăng nhập thành công! Chào mừng học sinh.";
-    }
+  if (roleData.role === "admin") {
+    message.textContent = "Đăng nhập thành công! Quyền ADMIN.";
+    showAdminDashboard();
+  } else {
+    message.textContent = "Đăng nhập thành công! Chào mừng học sinh.";
+  }
 }
 function showAdminDashboard() {
   let panel = document.getElementById("adminDashboard");
