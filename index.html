@@ -227,18 +227,49 @@ async function registerUser() {
 }
 
 async function loginUser() {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-  const message = document.getElementById("accountMessage");
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("accountMessage");
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
 
-  message.textContent = error
-    ? error.message
-    : "Đăng nhập thành công! Chào mừng đến RULER STUDY.";
+    if (error) {
+        message.textContent = error.message;
+        return;
+    }
+
+    const { data: roleData, error: roleError } = await supabaseClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .single();
+
+    if (roleError) {
+        message.textContent = "Đăng nhập thành công nhưng chưa kiểm tra được quyền.";
+        return;
+    }
+
+    if (roleData.role === "admin") {
+        message.textContent = "Đăng nhập thành công! Quyền ADMIN.";
+
+        let panel = document.getElementById("adminDashboard");
+
+        if (!panel) {
+            panel = document.createElement("section");
+            panel.id = "adminDashboard";
+            panel.innerHTML = `
+                <h2>👑 BẢNG ĐIỀU KHIỂN ADMIN</h2>
+                <p>Chào mừng quản trị viên RULER STUDY!</p>
+                <p>Quyền tài khoản: ADMIN</p>
+            `;
+            document.body.appendChild(panel);
+        }
+    } else {
+        message.textContent = "Đăng nhập thành công! Chào mừng học sinh.";
+    }
 }
 
 async function logoutUser() {
