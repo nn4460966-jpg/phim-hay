@@ -149,14 +149,38 @@ else{document.getElementById("result").textContent="Chưa đúng. Đáp án đú
 document.getElementById("next").style.display="inline-block";
 document.getElementById("next").textContent=current===questions.length-1?"Xem kết quả":"Câu tiếp theo";
 }
-function nextQuestion(){
-if(current<questions.length-1){current++;showQuestion();}
-else{
-document.getElementById("question").textContent="Hoàn thành bài thi!";
-document.getElementById("answers").innerHTML="";
-document.getElementById("result").textContent="Kết quả: "+score+"/"+questions.length+" câu đúng.";
-document.getElementById("next").style.display="none";
-}
+async function nextQuestion(){
+  if(current < questions.length - 1){
+    current++;
+    showQuestion();
+  } else {
+    document.getElementById("question").textContent = "Hoàn thành bài thi!";
+    document.getElementById("answers").innerHTML = "";
+    document.getElementById("result").textContent =
+      "Kết quả: " + score + "/" + questions.length + " câu đúng.";
+    document.getElementById("next").style.display = "none";
+
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    const user = sessionData.session?.user;
+
+    if(user){
+      const { error } = await supabaseClient
+        .from("quiz_attempts")
+        .insert({
+          user_id: user.id,
+          score: score,
+          total: questions.length
+        });
+
+      if(error){
+        document.getElementById("result").textContent +=
+          " (Không lưu được kết quả: " + error.message + ")";
+      } else {
+        document.getElementById("result").textContent +=
+          " (Đã lưu kết quả!)";
+      }
+    }
+  }
 }
 function saveNotes(){
 localStorage.setItem("rulerNotes",document.getElementById("notes").value);
