@@ -527,10 +527,22 @@ async function loadResults() {
     Điểm: ${r.score}/${r.total}</p>
   `).join("") || "Chưa có kết quả.";
 }
-  async function logoutUser() {
+ async function logoutUser() {
   const { error } = await supabaseClient.auth.signOut();
-  document.getElementById("accountMessage").textContent =
-    error ? error.message : "Đã đăng xuất.";
+
+  const dashboard = document.getElementById("adminDashboard");
+  if (dashboard) {
+    dashboard.remove();
+  }
+
+  const message = document.getElementById("accountMessage");
+
+  if (error) {
+    message.textContent = "Lỗi đăng xuất: " + error.message;
+    return;
+  }
+
+  message.textContent = "Đã đăng xuất thành công!";
 }
 </script>
 </body>
